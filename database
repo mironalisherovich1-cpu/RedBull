@@ -1,0 +1,31 @@
+from .db import get_db
+
+async def init_db():
+    db = await get_db()
+    await db.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        username TEXT,
+        language TEXT,
+        city TEXT,
+        balance REAL
+    )
+    """)
+    await db.commit()
+    await db.close()
+
+async def get_user(user_id: int):
+    db = await get_db()
+    cur = await db.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
+    row = await cur.fetchone()
+    await db.close()
+    return row
+
+async def create_user(user_id, username, language, city, balance):
+    db = await get_db()
+    await db.execute(
+        "INSERT INTO users VALUES (?, ?, ?, ?, ?)",
+        (user_id, username, language, city, balance)
+    )
+    await db.commit()
+    await db.close()
