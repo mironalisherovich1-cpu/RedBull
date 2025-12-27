@@ -1,17 +1,20 @@
 import asyncio
+import os
 from aiogram import Bot, Dispatcher
+from aiogram.filters import CommandStart
+from aiogram.types import Message
 
-from config import BOT_TOKEN
-from database.models import init_db
-from handlers.start import router as start_router
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 async def main():
-    await init_db()
+    print("Bot starting...")
 
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
 
-    dp.include_router(start_router)
+    @dp.message(CommandStart())
+    async def start_handler(message: Message):
+        await message.answer("✅ Bot Railway’da ishlayapti!")
 
     await dp.start_polling(bot)
 
